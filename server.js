@@ -29,7 +29,7 @@ const sess = {
     })
 };
 
-app.use (session(sess));
+app.use(session(sess));
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
@@ -41,6 +41,6 @@ app.set('view engine', 'handlebars');
 
 app.use(routes);
 
-sequelize.sync({ fore: false }).then(() => {
+sequelize.sync({ force: false }).then(() => {
     app.listen(PORT, () => console.log(`App listening on port ${PORT}!`));
 });
