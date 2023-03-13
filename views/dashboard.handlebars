@@ -1,21 +1,28 @@
 {{#if posts.length}}
-<section>
+  <section>
     <h2>Your Tech Posts</h2>
     <ol>
-        {{#each posts as |post|}}
+      {{#each posts as |post|}}
         <ul>
-            <article class="post">
-                <div class="title">
-                    <a href="/post/{{id}}">{{title}}</a>
-                </div>
-            </article>
-            <a href="/dashboard/edit/{{post.id}}" class="edit-link">Edit post</a>
+          <article class="post">
+            <div class="title">
+              <a href="/post/{{id}}">{{title}}</a>
+            </div>
+            <div class="meta">
+              <strong>Posted by
+                {{user.username}}
+                on
+                {{format_date created_at}}</strong>
+            </div>
+          </article>
+          <a href="/dashboard/edit/{{post.id}}" class="edit-link">Edit post</a>
         </ul>
-        {{/each}}
+      {{/each}}
     </ol>
-</section>
+  </section>
 {{/if}}
 
 <div>
-    <button type="submit"><a href="/dashboard/newpost" class="create-btn">Create a new Post</a></button>
+  <button type="submit"><a href="/dashboard/newpost" class="create-btn">Create a
+      new Post</a></button>
 </div>
