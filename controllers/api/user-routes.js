@@ -101,20 +101,21 @@ router.post('/login', async (req, res) => {
 });
 
 // Logout route
-router.post('/logout', withAuth, async (req, res) => {
+router.post("/logout", (req, res) => {
     try {
-        if (req.session.loggedIn) {
-            await req.session.destroy();
-            res.status(204).end();
-        } else {
-            res.status(404).end();
-        }
+      if (req.session.loggedIn) {
+        req.session.destroy(() => {
+          res.status(204).end();
+        });
+      } else {
+        res.status(404).end();
+      }
     } catch (err) {
-        console.log(err);
-        res.status(500).json(err);
+      console.error(err);
+      res.status(500).json(err);
     }
-});
-
+  });
+  
   // update route for user
   router.put('/:id', withAuth, async (req, res) => {
     try {
