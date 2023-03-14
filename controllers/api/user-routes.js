@@ -70,7 +70,7 @@ router.post('/', async (req, res) => {
     }
 });
 
-// Login route for users 
+// login route
 router.post('/login', async (req, res) => {
     try {
         const dbUserData = await User.findOne({
@@ -78,15 +78,19 @@ router.post('/login', async (req, res) => {
                 email: req.body.email
             }
         });
+
         if (!dbUserData) {
             res.status(404).json({ message: 'The username or password you entered is incorrect' });
             return;
         }
+
         const validPassword = dbUserData.checkPassword(req.body.password);
+
         if (!validPassword) {
             res.status(400).json({ message: 'The username or password you entered is incorrect' });
             return;
         }
+
         req.session.save(() => {
             req.session.user_id = dbUserData.id;
             req.session.username = dbUserData.username;
@@ -94,6 +98,7 @@ router.post('/login', async (req, res) => {
 
             res.json({ user: dbUserData, message: 'You have been logged in!' });
         });
+
     } catch (err) {
         console.log(err);
         res.status(500).json(err);
