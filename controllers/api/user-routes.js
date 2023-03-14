@@ -72,38 +72,37 @@ router.post('/', async (req, res) => {
 
 // login route
 router.post('/login', async (req, res) => {
-    try {
-        const dbUserData = await User.findOne({
-            where: {
-                email: req.body.email
-            }
-        });
+  try {
+    const userData = await User.findOne({ where: { email: req.body.email } });
 
-        if (!dbUserData) {
-            res.status(404).json({ message: 'The username or password you entered is incorrect' });
-            return;
-        }
-
-        const validPassword = dbUserData.checkPassword(req.body.password);
-
-        if (!validPassword) {
-            res.status(400).json({ message: 'The username or password you entered is incorrect' });
-            return;
-        }
-
-        req.session.save(() => {
-            req.session.user_id = dbUserData.id;
-            req.session.username = dbUserData.username;
-            req.session.loggedIn = true;
-
-            res.json({ user: dbUserData, message: 'You have been logged in!' });
-        });
-
-    } catch (err) {
-        console.log(err);
-        res.status(500).json(err);
+    if (!userData) {
+      res
+        .status(400)
+        .json({ message: 'Incorrect email or password, please try again' });
+      return;
     }
+
+    const validPassword = await userData.checkPassword(req.body.password);
+
+    if (!validPassword) {
+      res
+        .status(400)
+        .json({ message: 'Incorrect email or password, please try again' });
+      return;
+    }
+
+    req.session.save(() => {
+      req.session.user_id = userData.id;
+      req.session.logged_in = true;
+
+      res.redirect('/dashboard');
+    });
+
+  } catch (err) {
+    res.status(400).json(err);
+  }
 });
+
 
 // Logout route
 router.post("/logout", (req, res) => {
@@ -120,6 +119,20 @@ router.post("/logout", (req, res) => {
       res.status(500).json(err);
     }
   });
+
+  // Homepage route
+router.get("/", (req, res) => {
+  try {
+      if (req.session.loggedIn) {
+          res.render("homepage", {loggedIn: true});
+      } else {
+          res.render("homepage", {loggedIn: false});
+      }
+  } catch (err) {
+      console.error(err);
+      res.status(500).json(err);
+  }
+});
   
   // update route for user
   router.put('/:id', withAuth, async (req, res) => {
