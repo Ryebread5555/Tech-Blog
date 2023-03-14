@@ -3,8 +3,9 @@ const { Post, User, Comment } = require('../models');
 const withAuth = require('../utils/auth');
 const sequelize = require('../config/connection');
 
-// posts to be displayed by logged in users
+// render the dashboard view
 router.get('/', withAuth, async (req, res) => {
+  
   try {
     const dbPostData = await Post.findAll({
       where: {
@@ -28,7 +29,7 @@ router.get('/', withAuth, async (req, res) => {
     });
 
     const posts = dbPostData.map((post) => post.get({ plain: true }));
-    res.render('dashboard', { posts, loggedIn: true });
+    res.render('dashboard', { posts: posts, loggedIn: true });
   } catch (err) {
     console.log(err);
     res.status(500).json(err);
