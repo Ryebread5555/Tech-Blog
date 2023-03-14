@@ -4,39 +4,43 @@ const sequelize = require('../config/connection');
 
 // render all posts to the homepage
 router.get('/', async (req, res) => {
-    console.log(req.session);
-
     try {
+      if (req.session.loggedIn) {
+        // render dashboard if user is logged in
         const dbPostData = await Post.findAll({
-            attributes: [
-                'id',
-                'title',
-                'created_at',
-                'post_text'
-            ],
-            include: [
-                {
-                    model: Comment,
-                    attributes: ['id', 'comment_text', 'post_id', 'user_id', 'created_at'],
-                    include: {
-                        model: User,
-                        attributes: ['username']
-                    }
-                },
-                {
-                    model: User,
-                    attributes: ['username']
-                }
-            ]
+          where: {
+            user_id: req.session.user_id,
+          },
+          attributes: ['id', 'title', 'created_at', 'post_text'],
+          include: [
+            {
+              model: Comment,
+              attributes: ['id', 'comment_text', 'post_id', 'user_id', 'created_at'],
+              include: {
+                model: User,
+                attributes: ['username'],
+              },
+            },
+            {
+              model: User,
+              attributes: ['username'],
+            },
+          ],
         });
-
-        const posts = dbPostData.map(post => post.get({ plain: true }));
-        res.render('homepage', { posts, loggedIn: req.session.loggedIn });
+        const posts = dbPostData.map((post) => post.get({ plain: true }));
+        res.render('dashboard', { posts: posts, loggedIn: true });
+      } else {
+        // render homepage if user is not logged in
+        res.render('homepage', {
+          loggedIn: false
+        });
+      }
     } catch (err) {
-        console.log(err);
-        res.status(500).json(err);
+      console.log(err);
+      res.status(500).json(err);
     }
-});
+  });
+  
 
 // redirect user to homepage after log in
 router.get('/login', (req, res) => {
