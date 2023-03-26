@@ -20,8 +20,13 @@ const SequelizeStore = require('connect-session-sequelize')(session.Store);
 
 // create session
 const sess = {
-    secret: "ThedogIsaGoodboy",
-    cookie: { originalMaxAge: 600000 },
+    secret: 'Super secret secret',
+    cookie: {
+        maxAge: 50000000,
+        httpOnly: true,
+        secure: false,
+        sameSite: 'strict',
+    },
     resave: false,
     saveUninitialized: true,
     store: new SequelizeStore({
@@ -39,6 +44,13 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.engine('handlebars', hbs.engine);
 app.set('view engine', 'handlebars');
 
+// Set up a middleware to pass the "logged in" status to all views
+app.use((req, res, next) => {
+  res.locals.loggedIn = req.session.logged_in;
+  next();
+});
+
+// Set up routes
 app.use(routes);
 
 sequelize.sync({ force: false }).then(() => {
